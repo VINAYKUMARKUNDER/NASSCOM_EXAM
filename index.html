@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NASSCOM Mock Exam</title>
+<style>
+  :root {
+    --bg: #0f1419;
+    --surface: #1a2129;
+    --surface2: #222b35;
+    --border: #2d3742;
+    --text: #e8edf2;
+    --text-dim: #8b97a5;
+    --accent: #4f8cff;
+    --accent-dim: #2a4a8a;
+    --green: #2ecc71;
+    --green-dim: #1a5c34;
+    --red: #ff5c5c;
+    --red-dim: #5c1f1f;
+    --amber: #ffb84f;
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+  .container { max-width: 760px; margin: 0 auto; padding: 24px 16px 60px; }
+
+  /* ===== SCREENS ===== */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ===== HOME SCREEN ===== */
+  .hero {
+    text-align: center;
+    padding: 32px 16px 8px;
+  }
+  .hero h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+  .hero p { color: var(--text-dim); font-size: 14px; }
+
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 28px 0;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 8px;
+    text-align: center;
+  }
+  .stat-card .num { font-size: 22px; font-weight: 700; color: var(--accent); }
+  .stat-card .label { font-size: 11px; color: var(--text-dim); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card h3 { font-size: 15px; margin-bottom: 12px; color: var(--text); }
+
+  .opt-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .opt-row label {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.15s;
+    background: var(--surface2);
+  }
+  .opt-row input[type="radio"] { display: none; }
+  .opt-row label.selected { border-color: var(--accent); background: var(--accent-dim); color: #fff; }
+
+  .num-input {
+    width: 100%;
+    padding: 12px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 16px;
+    text-align: center;
+  }
+  .num-input:focus { outline: none; border-color: var(--accent); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 28px;
+    border-radius: var(--radius);
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.15s;
+    width: 100%;
+  }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: 0.92; }
+  .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: var(--border); }
+  .btn-row { display: flex; gap: 10px; }
+  .btn-row .btn { width: auto; flex: 1; }
+
+  .topic-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .tag {
+    font-size: 11px;
+    padding: 4px 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    color: var(--text-dim);
+  }
+
+  /* ===== EXAM SCREEN ===== */
+  .exam-header {
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .exam-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .timer {
+    font-size: 18px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: var(--surface2);
+  }
+  .timer.warning { color: var(--amber); }
+  .timer.danger { color: var(--red); background: var(--red-dim); animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  .q-counter { font-size: 13px; color: var(--text-dim); }
+
+  .progress-bar {
+    height: 5px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.25s;
+  }
+
+  .q-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    margin-bottom: 16px;
+  }
+  .q-tag {
+    display: inline-block;
+    font-size: 11px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .q-text {
+    font-size: 17px;
+    font-weight: 500;
+    margin-bottom: 18px;
+    line-height: 1.55;
+  }
+  .options { display: flex; flex-direction: column; gap: 10px; }
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 13px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14.5px;
+  }
+  .option:hover { border-color: var(--text-dim); }
+  .option.selected { border-color: var(--accent); background: var(--accent-dim); }
+  .option .letter {
+    width: 24px;
+    height: 24px;
+    min-width: 24px;
+    border-radius: 50%;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-dim);
+  }
+  .option.selected .letter { background: var(--accent); color: #fff; }
+
+  .nav-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .nav-row .btn { flex: 1; }
+
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 6px;
+    margin: 16px 0;
+  }
+  .palette-btn {
+    aspect-ratio: 1;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .palette-btn.answered { background: var(--green-dim); border-color: var(--green); color: var(--green); }
+  .palette-btn.current { border-color: var(--accent); border-width: 2px; color: var(--text); font-weight: 700; }
+  .palette-btn.flagged::after { content: ''; position: absolute; }
+
+  .legend { display: flex; gap: 14px; font-size: 11px; color: var(--text-dim); margin-top: 8px; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 4px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* ===== RESULTS SCREEN ===== */
+  .score-hero {
+    text-align: center;
+    padding: 20px 0 8px;
+  }
+  .score-ring {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
+    position: relative;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring .ring-bg { fill: none; stroke: var(--surface2); stroke-width: 10; }
+  .score-ring .ring-fill { fill: none; stroke: var(--accent); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
+  .score-ring .ring-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .score-ring .pct { font-size: 28px; font-weight: 700; }
+  .score-ring .frac { font-size: 12px; color: var(--text-dim); }
+
+  .verdict { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .verdict.pass { color: var(--green); }
+  .verdict.fail { color: var(--red); }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .breakdown-row:last-child { border-bottom: none; }
+  .breakdown-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 4px;
+    margin: 0 12px;
+    overflow: hidden;
+  }
+  .breakdown-fill { height: 100%; background: var(--accent); border-radius: 4px; }
+
+  .review-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    margin-bottom: 10px;
+  }
+  .review-item .q-text { font-size: 14.5px; margin-bottom: 10px; }
+  .review-opt {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .review-opt.correct { background: var(--green-dim); color: var(--green); }
+  .review-opt.incorrect { background: var(--red-dim); color: var(--red); }
+  .review-opt.neutral { background: var(--surface2); color: var(--text-dim); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 6px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text-dim);
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  h2.section-title { font-size: 18px; margin: 24px 0 12px; }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    max-width: 360px;
+    text-align: center;
+  }
+  .modal-box h3 { margin-bottom: 8px; font-size: 17px; }
+  .modal-box p { color: var(--text-dim); font-size: 13.5px; margin-bottom: 18px; }
+
+  footer.attribution {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 11.5px;
+    margin-top: 32px;
+  }
+
+  @media (max-width: 480px) {
+    .stat-grid { gap: 8px; }
+    .palette { grid-template-columns: repeat(8, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ============ HOME SCREEN ============ -->
+  <div id="screen-home" class="screen active">
+    <div class="hero">
+      <h1>NASSCOM Mock Exam</h1>
+      <p>Practice test engine — runs fully in your browser</p>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-card"><div class="num" id="stat-total">--</div><div class="label">Questions in bank</div></div>
+      <div class="stat-card"><div class="num">50</div><div class="label">Per exam</div></div>
+      <div class="stat-card"><div class="num" id="stat-time">45</div><div class="label">Minutes</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Exam settings</h3>
+      <label style="font-size:13px; color:var(--text-dim); display:block; margin-bottom:6px;">Number of questions</label>
+      <input type="number" id="num-questions" class="num-input" value="50" min="5" max="250" style="margin-bottom:14px;">
+      <label style="font-size:13px; color:var(--text-dim); display:block; margin-bottom:6px;">Time limit (minutes)</label>
+      <input type="number" id="time-limit" class="num-input" value="45" min="5" max="180">
+      <div class="topic-tags" id="topic-tags"></div>
+    </div>
+
+    <button class="btn btn-primary" id="btn-start-exam" style="margin-bottom:10px;">Start exam</button>
+    <button class="btn btn-secondary" id="btn-view-bank">Browse full question bank</button>
+
+    <footer class="attribution">All data stored locally in your browser session. No server, no login.</footer>
+  </div>
+
+  <!-- ============ EXAM SCREEN ============ -->
+  <div id="screen-exam" class="screen">
+    <div class="exam-header">
+      <div class="exam-top-row">
+        <span class="q-counter" id="q-counter">Question 1 of 50</span>
+        <span class="timer" id="timer">45:00</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:2%"></div></div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-tag" id="q-tag">SDLC</span>
+      <div class="q-text" id="q-text">Loading question...</div>
+      <div class="options" id="q-options"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn btn-secondary" id="btn-prev">← Previous</button>
+      <button class="btn btn-primary" id="btn-next">Next →</button>
+    </div>
+
+    <h2 class="section-title" style="font-size:14px; color:var(--text-dim); margin-top:24px;">Question palette</h2>
+    <div class="palette" id="palette"></div>
+    <div class="legend">
+      <span><span class="dot" style="background:var(--green);"></span> Answered</span>
+      <span><span class="dot" style="background:var(--surface2); border:1px solid var(--border);"></span> Unanswered</span>
+      <span><span class="dot" style="background:var(--accent);"></span> Current</span>
+    </div>
+
+    <button class="btn btn-primary" id="btn-submit-exam" style="margin-top:24px; background:var(--red);">Submit exam</button>
+  </div>
+
+  <!-- ============ RESULTS SCREEN ============ -->
+  <div id="screen-results" class="screen">
+    <div class="score-hero">
+      <div class="score-ring">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle class="ring-bg" cx="70" cy="70" r="60"></circle>
+          <circle class="ring-fill" id="ring-fill" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="377"></circle>
+        </svg>
+        <div class="ring-text">
+          <div class="pct" id="result-pct">0%</div>
+          <div class="frac" id="result-frac">0/50</div>
+        </div>
+      </div>
+      <div class="verdict" id="verdict-text">--</div>
+      <p style="color:var(--text-dim); font-size:13px;" id="time-taken-text">Time taken: --</p>
+    </div>
+
+    <div class="card">
+      <h3>Performance by topic</h3>
+      <div id="breakdown-list"></div>
+    </div>
+
+    <div class="btn-row" style="margin-bottom:24px;">
+      <button class="btn btn-secondary" id="btn-retake">Retake new exam</button>
+      <button class="btn btn-primary" id="btn-review">Review answers</button>
+    </div>
+
+    <div id="review-section" style="display:none;">
+      <h2 class="section-title">Review</h2>
+      <div class="filter-row">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="incorrect">Incorrect only</button>
+        <button class="filter-btn" data-filter="correct">Correct only</button>
+      </div>
+      <div id="review-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Confirm submit modal -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal-box">
+    <h3 id="modal-title">Submit exam?</h3>
+    <p id="modal-text">You still have unanswered questions. Are you sure you want to submit?</p>
+    <div class="btn-row">
+      <button class="btn btn-secondary" id="modal-cancel">Cancel</button>
+      <button class="btn btn-primary" id="modal-confirm-btn">Submit</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   NASSCOM MOCK EXAM — Pure vanilla JS, frontend-only
+   Question bank embedded below. No backend required.
+============================================================ */
+
+const QUESTION_BANK = [{"id":1,"cat":"SDLC","q":"What is the primary objective of the SDLC?","opts":["Deliver software quickly regardless of quality","Provide a systematic approach to developing high-quality software","Eliminate the need for testing","Avoid stakeholder involvement in development"],"a":1},{"id":2,"cat":"SDLC","q":"Which phase of SDLC involves defining the scope, objectives, and feasibility of the project?","opts":["Design Phase","Planning Phase","Testing Phase","Deployment Phase"],"a":1},{"id":3,"cat":"SDLC","q":"What type of feasibility assesses whether the software will work effectively in its intended operational environment?","opts":["Technical Feasibility","Economic Feasibility","Operational Feasibility","Legal Feasibility"],"a":2},{"id":4,"cat":"SDLC","q":"Which feasibility type evaluates whether the project is financially viable?","opts":["Technical Feasibility","Economic Feasibility","Operational Feasibility","Legal Feasibility"],"a":1},{"id":5,"cat":"SDLC","q":"Which feasibility type checks whether the existing technology can support the project?","opts":["Technical Feasibility","Economic Feasibility","Operational Feasibility","Legal Feasibility"],"a":0},{"id":6,"cat":"SDLC","q":"What does the V-Model in SDLC emphasize?","opts":["Iterative and incremental development","Verification and validation at each stage","Quick prototyping","Continuous integration and delivery"],"a":1},{"id":7,"cat":"SDLC","q":"Which document is created during the Requirement Analysis phase to detail functional and non-functional requirements?","opts":["Feasibility Report","Software Requirements Specification (SRS)","Design Document","Risk Management Plan"],"a":1},{"id":8,"cat":"SDLC","q":"In the Design Phase of SDLC, what is the focus of Low-Level Design (LLD)?","opts":["Establishing system architecture and module roles","Defining the database schema","Outlining detailed algorithms and class diagrams","High-level system interactions"],"a":2},{"id":9,"cat":"SDLC","q":"What is the primary focus of High-Level Design (HLD)?","opts":["Detailed pseudocode for each function","Overall system architecture and module roles","Individual variable naming conventions","Unit test case creation"],"a":1},{"id":10,"cat":"SDLC","q":"Which phase of SDLC involves migrating data and ensuring environment configurations are ready for production?","opts":["Testing","Design","Deployment","Planning"],"a":2},{"id":11,"cat":"SDLC","q":"Which SDLC model is best suited for projects with rapidly changing requirements?","opts":["Waterfall Model","V-Model","Agile Model","Spiral Model"],"a":2},{"id":12,"cat":"SDLC","q":"Which SDLC model combines iterative development with risk management?","opts":["Agile","Waterfall","Spiral","Iterative"],"a":2},{"id":13,"cat":"SDLC","q":"Which SDLC model follows a strictly sequential, linear approach?","opts":["Agile Model","Waterfall Model","Spiral Model","Scrum"],"a":1},{"id":14,"cat":"SDLC","q":"What is the main disadvantage of the Waterfall Model?","opts":["Too flexible for changing requirements","Difficult to accommodate changes once a phase is complete","Requires too much stakeholder involvement","Cannot be documented properly"],"a":1},{"id":15,"cat":"SDLC","q":"Which Agile framework is characterized by time-boxed iterations and roles like Scrum Master and Product Owner?","opts":["Kanban","Spiral","Scrum","Waterfall"],"a":2},{"id":16,"cat":"SDLC","q":"In Scrum, what is the typical duration of a sprint?","opts":["1 day","2-4 weeks","6 months","1 year"],"a":1},{"id":17,"cat":"SDLC","q":"Who is responsible for maximizing the value of the product in Scrum?","opts":["Scrum Master","Product Owner","Development Team","Stakeholder"],"a":1},{"id":18,"cat":"SDLC","q":"Who facilitates Scrum events and removes impediments for the team?","opts":["Product Owner","Scrum Master","Business Analyst","Project Sponsor"],"a":1},{"id":19,"cat":"SDLC","q":"What is the primary purpose of the Planning phase in SDLC?","opts":["Writing code for the software","Defining project scope, objectives, and feasibility","Creating architectural diagrams","Executing the test cases"],"a":1},{"id":20,"cat":"SDLC","q":"In which phase of the SDLC is a Feasibility Report typically prepared?","opts":["Design Phase","Implementation Phase","Planning Phase","Maintenance Phase"],"a":2},{"id":21,"cat":"SDLC","q":"What is a key benefit of prototyping during Requirement Analysis?","opts":["Reduces the need for documentation","Avoids stakeholder involvement","Provides early visualization of the system","Simplifies the testing phase"],"a":2},{"id":22,"cat":"SDLC","q":"Which of the following is a non-functional requirement?","opts":["The system must generate monthly sales reports.","The application must encrypt data during transmission.","Users must be able to log in with a username and password.","The application must allow report generation."],"a":1},{"id":23,"cat":"SDLC","q":"Which of the following is a functional requirement?","opts":["The system must respond within 2 seconds.","Users must be able to reset their password via email.","The application must be available 99.9% of the time.","Data must be encrypted at rest."],"a":1},{"id":24,"cat":"SDLC","q":"What is the purpose of a Requirement Traceability Matrix (RTM)?","opts":["Map requirements to design elements","Track requirements throughout the SDLC","Identify risks in the design phase","Document test execution outcomes"],"a":1},{"id":25,"cat":"SDLC","q":"Which design phase focuses on detailed algorithms and class diagrams?","opts":["High-Level Design (HLD)","Low-Level Design (LLD)","Architectural Design","Feasibility Analysis"],"a":1},{"id":26,"cat":"SDLC","q":"What does CI stand for in a DevOps pipeline?","opts":["Code Inspection","Continuous Integration","Component Isolation","Critical Implementation"],"a":1},{"id":27,"cat":"SDLC","q":"What is the purpose of Continuous Integration (CI) in a DevOps pipeline?","opts":["Automate deployment to production","Merge code changes into a shared repository frequently","Eliminate the need for testing","Monitor application performance in real time"],"a":1},{"id":28,"cat":"SDLC","q":"What does CD typically stand for in a DevOps context?","opts":["Code Deletion","Continuous Deployment/Delivery","Critical Defect","Centralized Database"],"a":1},{"id":29,"cat":"SDLC","q":"Which tool is commonly used for version control in software development?","opts":["Jenkins","Docker","Git","JIRA"],"a":2},{"id":30,"cat":"SDLC","q":"Which tool is widely used for CI/CD build automation?","opts":["Git","Jenkins","Photoshop","Excel"],"a":1},{"id":31,"cat":"SDLC","q":"Which tool is commonly used for containerization in deployment pipelines?","opts":["Docker","Selenium","JIRA","Nagios"],"a":0},{"id":32,"cat":"SDLC","q":"What is the Big Bang deployment strategy?","opts":["Deploying in small phases over time","Deploying everything at once to all users","Deploying only to a small test group first","Rolling back automatically on failure"],"a":1},{"id":33,"cat":"SDLC","q":"What is the main advantage of Canary deployment?","opts":["Deploys to everyone at once for speed","Reduces risk by releasing to a small group first","Requires no monitoring","Eliminates the need for rollback plans"],"a":1},{"id":34,"cat":"SDLC","q":"In Blue-Green deployment, what is the main benefit?","opts":["Minimal downtime during release","Lower hardware cost","No need for two environments","Faster code writing"],"a":0},{"id":35,"cat":"SDLC","q":"Which type of maintenance involves fixing bugs after deployment?","opts":["Adaptive Maintenance","Corrective Maintenance","Perfective Maintenance","Preventive Maintenance"],"a":1},{"id":36,"cat":"SDLC","q":"Which type of maintenance involves modifying software to work in a new environment?","opts":["Corrective Maintenance","Adaptive Maintenance","Perfective Maintenance","Preventive Maintenance"],"a":1},{"id":37,"cat":"SDLC","q":"Which type of maintenance involves adding new features to improve software?","opts":["Corrective Maintenance","Adaptive Maintenance","Perfective Maintenance","Preventive Maintenance"],"a":2},{"id":38,"cat":"SDLC","q":"What is the main goal of Preventive Maintenance?","opts":["Fix current bugs","Add new features","Prevent future problems before they occur","Adapt to new hardware"],"a":2},{"id":39,"cat":"SDLC","q":"What does Kanban primarily use to visualize workflow?","opts":["Gantt charts","A board with columns representing work stages","Class diagrams","ER diagrams"],"a":1},{"id":40,"cat":"SDLC","q":"Which Agile principle emphasizes delivering working software frequently?","opts":["Comprehensive documentation over working software","Working software over comprehensive documentation","Following a plan over responding to change","Contract negotiation over customer collaboration"],"a":1},{"id":41,"cat":"Architecture","q":"Which architecture pattern divides an application into layers like Presentation, Business Logic, and Data Access?","opts":["Microservices Architecture","Event-Driven Architecture","Layered (N-Tier) Architecture","Monolithic Architecture"],"a":2},{"id":42,"cat":"Architecture","q":"What is a characteristic advantage of the Microservices Architecture pattern?","opts":["All features are built into a single codebase","Services are independent and can scale separately","Real-time processing is streamlined","High dependency among modules"],"a":1},{"id":43,"cat":"Architecture","q":"Which architecture pattern is ideal for applications requiring real-time event processing?","opts":["Layered Architecture","Monolithic Architecture","Event-Driven Architecture","Client-Server Architecture"],"a":2},{"id":44,"cat":"Architecture","q":"What is a key disadvantage of Monolithic Architecture?","opts":["Difficult to scale individual components independently","Too many independent services to manage","Requires complex message queues","Cannot be deployed as a single unit"],"a":0},{"id":45,"cat":"Architecture","q":"In Client-Server Architecture, what is the role of the server?","opts":["Only displays the UI","Centralized resource and request management","Stores user passwords in plaintext","Runs only on mobile devices"],"a":1},{"id":46,"cat":"Architecture","q":"Which messaging tool is commonly associated with Event-Driven Architecture?","opts":["Kafka","Selenium","JMeter","Git"],"a":0},{"id":47,"cat":"Architecture","q":"What is a key principle of Security by Design?","opts":["Delaying security implementations until deployment","Using a single layer of defense for simplicity","Embedding security measures throughout the SDLC","Relying solely on penetration testing"],"a":2},{"id":48,"cat":"Architecture","q":"Which UI/UX design component helps guide user focus?","opts":["Typography","Interactive Elements","Visual Hierarchy","Color Palette"],"a":2},{"id":49,"cat":"Architecture","q":"What does Typography refer to in UI design?","opts":["The arrangement of buttons","Fonts and text sizes used in the interface","The color scheme of the app","The backend database structure"],"a":1},{"id":50,"cat":"Architecture","q":"In UX design, what does Wireframing refer to?","opts":["Final polished visual designs","Low-fidelity sketches outlining structure","Backend API documentation","Color palette selection"],"a":1},{"id":51,"cat":"Architecture","q":"What does Prototyping in UX design involve?","opts":["Writing final production code","Creating interactive models to test user flow","Designing the database schema","Conducting security audits"],"a":1},{"id":52,"cat":"Architecture","q":"What is the focus of Usability in UX design?","opts":["How visually appealing the app looks","How easily users can complete tasks","The backend server response time","The number of features in the app"],"a":1},{"id":53,"cat":"Architecture","q":"What does Information Architecture refer to in UX?","opts":["The server hardware layout","Logical organization and structure of content","The color palette used","The programming language chosen"],"a":1},{"id":54,"cat":"Architecture","q":"Which principle states users should only have access to resources necessary for their role?","opts":["Defense in Depth","Least Privilege","Secure Defaults","Zero Trust"],"a":1},{"id":55,"cat":"Architecture","q":"What does the principle of Least Privilege refer to in Security by Design?","opts":["Allowing maximum user access by default","Restricting access to only necessary resources","Avoiding role-based access control","Using open network configurations"],"a":1},{"id":56,"cat":"Architecture","q":"What is the goal of Input Validation as a security principle?","opts":["Speed up application performance","Prevent malicious or malformed input from causing harm","Reduce database storage size","Improve UI aesthetics"],"a":1},{"id":57,"cat":"Architecture","q":"What does Secure Defaults mean in system design?","opts":["Systems are insecure until manually configured","Systems are secure by default without extra configuration","Defaults should always allow maximum access","Security settings should be hidden from admins"],"a":1},{"id":58,"cat":"Architecture","q":"Which architecture pattern is best suited when independent scaling of components is a top priority?","opts":["Monolithic Architecture","Microservices Architecture","Single-tier Architecture","Flat file architecture"],"a":1},{"id":59,"cat":"Architecture","q":"What is a key benefit of N-Tier (Layered) Architecture?","opts":["Each layer can be developed and tested independently","All logic must reside in one layer","It eliminates the need for a database","It cannot scale horizontally"],"a":0},{"id":60,"cat":"Architecture","q":"What is Visual Hierarchy primarily used for in UI design?","opts":["Increasing server speed","Guiding the user's attention to important elements first","Reducing the number of colors used","Hiding less important features completely"],"a":1},{"id":61,"cat":"Architecture","q":"Which of these is an example of an Interactive Element in UI design?","opts":["Buttons and sliders","Database schema","Server logs","Source code comments"],"a":0},{"id":62,"cat":"Architecture","q":"What is the main advantage of Event-Driven Architecture for IoT applications?","opts":["Sequential batch processing only","Real-time responsiveness to events","Requires no network connectivity","Eliminates the need for sensors"],"a":1},{"id":63,"cat":"Architecture","q":"Why is Security by Design considered better than adding security later?","opts":["It is cheaper to patch security after release","It reduces vulnerabilities by integrating security from the start","It removes the need for testing","It only applies to large enterprise systems"],"a":1},{"id":64,"cat":"Architecture","q":"Color Palette in UI design primarily contributes to which aspect?","opts":["Branding and visual consistency","Backend database performance","API response time","Server uptime"],"a":0},{"id":65,"cat":"Architecture","q":"Which architecture would a startup likely choose initially for simplicity, despite scaling challenges later?","opts":["Microservices","Event-Driven","Monolithic","Distributed mesh"],"a":2},{"id":66,"cat":"Architecture","q":"What does Zero Trust Architecture assume about network requests?","opts":["All internal requests are automatically trusted","Every request is treated as untrusted until verified","Only external requests need verification","Trust is granted permanently after first login"],"a":1},{"id":67,"cat":"Architecture","q":"Which design phase output would typically include a system block diagram?","opts":["Low-Level Design","High-Level Design","Unit Testing","Maintenance"],"a":1},{"id":68,"cat":"Architecture","q":"What is the primary purpose of conducting Usability Testing in UX design?","opts":["To check server load capacity","To verify the application is intuitive and user-friendly","To check database normalization","To test network bandwidth"],"a":1},{"id":69,"cat":"Architecture","q":"In a layered architecture, which layer typically handles direct interaction with the database?","opts":["Presentation Layer","Business Logic Layer","Data Access Layer","UI Layer"],"a":2},{"id":70,"cat":"Architecture","q":"What does 'Defense in Depth' rely on architecturally?","opts":["A single robust firewall","Multiple independent layers of security controls","Removing all external network access","Relying only on antivirus software"],"a":1},{"id":71,"cat":"Testing","q":"What is the primary focus of functional testing?","opts":["System scalability and performance","Security vulnerabilities","Verification of features as per requirements","Hardware compatibility"],"a":2},{"id":72,"cat":"Testing","q":"Which tool is commonly used for performance testing?","opts":["Selenium","JIRA","JMeter","OWASP ZAP"],"a":2},{"id":73,"cat":"Testing","q":"Which of the following testing types ensures that changes or updates have not introduced new defects?","opts":["Smoke Testing","Integration Testing","Regression Testing","Usability Testing"],"a":2},{"id":74,"cat":"Testing","q":"What type of testing focuses on evaluating attributes like speed, scalability, and stability under load?","opts":["Security Testing","Performance Testing","Usability Testing","Compatibility Testing"],"a":1},{"id":75,"cat":"Testing","q":"Which type of testing ensures the system is user-friendly and intuitive?","opts":["Security Testing","Regression Testing","Usability Testing","Compatibility Testing"],"a":2},{"id":76,"cat":"Testing","q":"What is the main advantage of automated regression testing?","opts":["Eliminates the need for functional testing","Speeds up repetitive test execution","Reduces the need for a testing environment","Avoids the need for detailed test plans"],"a":1},{"id":77,"cat":"Testing","q":"What is Smoke Testing primarily used for?","opts":["Detailed performance benchmarking","Checking basic critical functionality works","Testing UI colors only","Validating database backups"],"a":1},{"id":78,"cat":"Testing","q":"What is Sanity Testing typically performed for?","opts":["Quick verification after a specific bug fix","Testing the entire application from scratch","Load testing under heavy traffic","Validating network protocols"],"a":0},{"id":79,"cat":"Testing","q":"What level of testing checks individual functions or methods in isolation?","opts":["System Testing","Unit Testing","Acceptance Testing","Integration Testing"],"a":1},{"id":80,"cat":"Testing","q":"Which testing level checks the interaction between multiple integrated modules?","opts":["Unit Testing","Integration Testing","Acceptance Testing","Smoke Testing"],"a":1},{"id":81,"cat":"Testing","q":"Who typically performs User Acceptance Testing (UAT)?","opts":["Developers","Database Administrators","End-users or stakeholders","Network engineers"],"a":2},{"id":82,"cat":"Testing","q":"Which testing tool is widely used for browser automation?","opts":["Selenium","Nagios","SNMP","Ansible"],"a":0},{"id":83,"cat":"Testing","q":"What does Black Box Testing focus on?","opts":["Internal code structure","Functionality without knowledge of internal code","Server hardware specifications","Network bandwidth"],"a":1},{"id":84,"cat":"Testing","q":"What does White Box Testing focus on?","opts":["Only external user interface","Internal code logic and structure","Marketing requirements","Hardware compatibility"],"a":1},{"id":85,"cat":"Testing","q":"What is Gray Box Testing?","opts":["Testing with zero knowledge of the system","A combination of Black Box and White Box approaches","Testing only the database layer","Testing only UI colors"],"a":1},{"id":86,"cat":"Testing","q":"Which testing type evaluates the application across different OS, browsers, or devices?","opts":["Compatibility Testing","Load Testing","Smoke Testing","Static Testing"],"a":0},{"id":87,"cat":"Testing","q":"What is the goal of Load Testing?","opts":["Test under expected normal user load","Push the system beyond its limits to find breaking point","Check only UI consistency","Validate documentation accuracy"],"a":0},{"id":88,"cat":"Testing","q":"What is the goal of Stress Testing?","opts":["Test under normal expected load","Push the system beyond its limits to identify breaking points","Test only static documents","Validate user interface colors"],"a":1},{"id":89,"cat":"Testing","q":"Which security testing tool is commonly used for penetration testing?","opts":["JMeter","OWASP ZAP","Git","Jenkins"],"a":1},{"id":90,"cat":"Testing","q":"Which testing technique evaluates documentation and code without executing it?","opts":["Dynamic Testing","Static Testing","Load Testing","Smoke Testing"],"a":1},{"id":91,"cat":"Testing","q":"Dynamic Testing involves what kind of activity?","opts":["Reviewing requirement documents only","Executing the application code to validate behavior","Reviewing code without execution","Only checking the database schema"],"a":1},{"id":92,"cat":"Testing","q":"What is the main goal of Risk-Based Testing?","opts":["Test all functionalities equally regardless of importance","Prioritize testing for high-impact, high-risk areas","Eliminate the need for a test plan","Focus only on UI testing"],"a":1},{"id":93,"cat":"Testing","q":"Which testing tool is commonly used for API testing?","opts":["Postman","Photoshop","Nagios","Ansible"],"a":0},{"id":94,"cat":"Testing","q":"Which tool is commonly used for mobile application testing?","opts":["Appium","JMeter","Nagios","SNMP"],"a":0},{"id":95,"cat":"Testing","q":"What does Manual Testing primarily rely on?","opts":["Automated scripts only","Human testers executing test cases manually","AI-generated reports","Database triggers"],"a":1},{"id":96,"cat":"Testing","q":"What is a key advantage of Automated Testing over Manual Testing?","opts":["Better human judgment in edge cases","Fast, repeatable, and scalable test execution","Lower initial setup cost","No need for test scripts"],"a":1},{"id":97,"cat":"Testing","q":"Which testing tool helps in bug/issue tracking?","opts":["JIRA","Selenium","JMeter","OWASP ZAP"],"a":0},{"id":98,"cat":"Testing","q":"What is the main purpose of a Test Plan document?","opts":["List of all software bugs found","Outline strategy, scope, resources, and schedule for testing","Record of all source code changes","Database schema diagram"],"a":1},{"id":99,"cat":"Testing","q":"What does a Test Case typically include?","opts":["Marketing requirements","Preconditions, steps, expected results","Server hardware specs","UI color codes"],"a":1},{"id":100,"cat":"Testing","q":"What is Exploratory Testing?","opts":["Testing strictly following predefined scripts","Simultaneous learning, test design, and execution without scripts","Only automated regression testing","Testing performed only by end users"],"a":1},{"id":101,"cat":"Testing","q":"What is the purpose of a Defect/Bug Life Cycle?","opts":["To track a bug from discovery to resolution","To design the UI layout","To manage network configurations","To monitor server hardware"],"a":0},{"id":102,"cat":"Testing","q":"Which testing type is typically performed first immediately after a new build is deployed?","opts":["Regression Testing","Smoke Testing","UAT","Stress Testing"],"a":1},{"id":103,"cat":"Testing","q":"What does Code Coverage measure in testing?","opts":["Number of bugs found","Percentage of source code exercised by tests","Number of testers on the team","Speed of the application"],"a":1},{"id":104,"cat":"Testing","q":"Which type of testing validates whether software meets contractual or regulatory requirements?","opts":["Compliance Testing","Smoke Testing","Unit Testing","Load Testing"],"a":0},{"id":105,"cat":"Testing","q":"In Agile development, when is testing typically performed?","opts":["Only at the very end of the project","Continuously throughout each sprint","Only during the planning phase","Only after deployment"],"a":1},{"id":106,"cat":"Testing","q":"What is a Test Stub used for in Integration Testing?","opts":["Replace a missing component with a dummy that returns fixed responses","Replace the entire production database","Eliminate the need for test cases","Monitor network traffic"],"a":0},{"id":107,"cat":"Testing","q":"What is Boundary Value Analysis used for in test design?","opts":["Testing values at the edges of input ranges","Testing only positive numbers","Testing UI colors","Testing server uptime"],"a":0},{"id":108,"cat":"Testing","q":"What is Equivalence Partitioning in testing?","opts":["Dividing input data into groups expected to behave similarly","Splitting the database into partitions","Dividing the team into testing groups","Splitting code into microservices"],"a":0},{"id":109,"cat":"Testing","q":"What does the term 'False Positive' mean in testing/security context?","opts":["A real defect correctly identified","A test incorrectly flags an issue that doesn't actually exist","A test that always passes","A defect that is never found"],"a":1},{"id":110,"cat":"Testing","q":"Which of these best describes Regression Testing's purpose?","opts":["Verify new features only","Ensure existing functionality still works after changes","Test only performance under load","Test only security vulnerabilities"],"a":1},{"id":111,"cat":"Testing","q":"What is the purpose of a Traceability Matrix in testing?","opts":["Map test cases back to requirements","Track server hardware inventory","Manage network IP addresses","Track employee attendance"],"a":0},{"id":112,"cat":"Testing","q":"Which testing approach is best for testing a system without any access to its internal code?","opts":["White Box Testing","Black Box Testing","Static Testing","Unit Testing"],"a":1},{"id":113,"cat":"Testing","q":"What is the role of a Test Environment in software testing?","opts":["A replica setup used to execute test cases safely","The production server itself","A document listing project risks","A diagram of system architecture"],"a":0},{"id":114,"cat":"Testing","q":"Which testing technique is used to test all possible combinations of inputs systematically?","opts":["Decision Table Testing","Smoke Testing","Sanity Testing","Static Testing"],"a":0},{"id":115,"cat":"Testing","q":"What is the main goal of Compatibility Testing in a mobile app context?","opts":["Test app data encryption","Test app behavior across various devices, OS versions, and screen sizes","Test app source code quality","Test database schema integrity"],"a":1},{"id":116,"cat":"QA","q":"What is the primary focus of Quality Assurance (QA)?","opts":["Detecting and fixing defects in finished products","Preventing defects by improving processes","Speeding up the development lifecycle","Reducing the cost of hardware"],"a":1},{"id":117,"cat":"QA","q":"Which QA activity involves regular evaluations of processes and outcomes to identify bottlenecks?","opts":["Monitoring","Implementation","Testing","Debugging"],"a":0},{"id":118,"cat":"QA","q":"What is the difference between QA and QC (Quality Control)?","opts":["QA is product-oriented, while QC is process-oriented","QA involves preventing defects, while QC focuses on detecting defects","QA is only performed after development, while QC happens during design","There is no difference; they are synonymous"],"a":1},{"id":119,"cat":"QA","q":"Which type of QA testing focuses on evaluating documentation and code without execution?","opts":["Manual Testing","Static Testing","Automated Testing","Dynamic Testing"],"a":1},{"id":120,"cat":"QA","q":"What is a common tool used for automated QA testing?","opts":["JIRA","Selenium","Git","Jenkins"],"a":1},{"id":121,"cat":"QA","q":"What does QA stand for?","opts":["Quality Assurance","Quick Analysis","Quality Application","Quantitative Assessment"],"a":0},{"id":122,"cat":"QA","q":"Which of the following best describes QC (Quality Control)?","opts":["A proactive, process-oriented approach","A reactive, product-oriented approach focused on finding defects","Only applicable in the Planning phase","A synonym for code review"],"a":1},{"id":123,"cat":"QA","q":"What is the goal of the QA Planning stage?","opts":["Define quality objectives and metrics","Write final production code","Deploy the application","Conduct user training"],"a":0},{"id":124,"cat":"QA","q":"Which standard relates to Quality Management Systems?","opts":["ISO 9001","ISO 27001","GDPR","HIPAA"],"a":0},{"id":125,"cat":"QA","q":"Which standard relates to Information Security Management Systems?","opts":["ISO 9001","ISO 27001","Six Sigma","CMMI"],"a":1},{"id":126,"cat":"QA","q":"What is the focus of Six Sigma methodology?","opts":["Marketing strategy","Data-driven process improvement to minimize defects","UI color theory","Network configuration"],"a":1},{"id":127,"cat":"QA","q":"What does CMMI stand for?","opts":["Capability Maturity Model Integration","Continuous Monitoring and Management Index","Code Management Model Initiative","Cybersecurity Maturity Model Integration"],"a":0},{"id":128,"cat":"QA","q":"What does Defect Density measure?","opts":["Number of defects per unit of code size","Speed of bug fixing","Number of testers on a project","Server response time"],"a":0},{"id":129,"cat":"QA","q":"What does MTBF stand for in quality metrics?","opts":["Mean Time Between Failures","Maximum Test Build Frequency","Minimum Time Before Fix","Mean Test Bug Frequency"],"a":0},{"id":130,"cat":"QA","q":"What is the purpose of a QA Audit?","opts":["To verify processes comply with defined quality standards","To fix bugs directly in code","To configure network devices","To design the UI"],"a":0},{"id":131,"cat":"QA","q":"Which QA process stage involves designing test cases and quality processes?","opts":["Planning","Design","Implementation","Monitoring"],"a":1},{"id":132,"cat":"QA","q":"What is Continuous Improvement in the QA lifecycle primarily based on?","opts":["One-time audits only","Ongoing feedback used to optimize processes","Ignoring past defects","Eliminating all testing"],"a":1},{"id":133,"cat":"QA","q":"Which of the following is a QA-related compliance regulation focused on data protection?","opts":["GDPR","JMeter","Selenium","Kanban"],"a":0},{"id":134,"cat":"QA","q":"In QA, what does 'process-oriented' mean?","opts":["Focus is on the final product only","Focus is on improving the methods used to create the product","Focus is on hardware only","Focus is on marketing strategy"],"a":1},{"id":135,"cat":"QA","q":"Why is QA considered a preventive approach?","opts":["It happens only after the product is released","It aims to prevent defects before they occur by improving processes","It only checks the final build","It ignores requirements"],"a":1},{"id":136,"cat":"QA","q":"What role does QA play during the Implementation phase of SDLC?","opts":["Executing QA practices alongside development","Writing the final user manual","Conducting market research","Selling the final product"],"a":0},{"id":137,"cat":"QA","q":"What is a primary output of a QA review of code?","opts":["A sales report","A code review report with identified issues and suggestions","A network diagram","A marketing brochure"],"a":1},{"id":138,"cat":"QA","q":"What is the relationship between QA and Testing?","opts":["Testing is a subset of activities QA oversees, focused on detecting defects","Testing is unrelated to QA","QA is a subset of Testing","They are mutually exclusive processes"],"a":0},{"id":139,"cat":"QA","q":"What is a Quality Metric typically used to evaluate?","opts":["Marketing effectiveness","The performance and reliability of a process or product","Stock price of the company","Number of office employees"],"a":1},{"id":140,"cat":"QA","q":"Which best practice helps QA teams catch defects early in development?","opts":["Skipping code reviews","Conducting regular code reviews and static analysis","Testing only at the end of the project","Avoiding documentation"],"a":1},{"id":141,"cat":"QA","q":"What does the 'Monitoring' phase of QA lifecycle primarily involve?","opts":["Writing new code","Tracking and evaluating processes for adherence to quality goals","Designing UI mockups","Conducting sales demos"],"a":1},{"id":142,"cat":"QA","q":"Which of these best fits as a QA responsibility versus a developer's responsibility?","opts":["Writing feature code","Defining and enforcing quality standards across the SDLC","Designing the database schema","Choosing the programming language"],"a":1},{"id":143,"cat":"QA","q":"What is the key benefit of integrating QA early in the SDLC (shift-left approach)?","opts":["Defects are found and fixed later, increasing cost","Defects are caught earlier, reducing cost and rework","It eliminates the need for testing entirely","It removes the need for documentation"],"a":1},{"id":144,"cat":"QA","q":"Which of the following is an example of a QA process improvement activity?","opts":["Refining the code review checklist based on past defects","Adding more RAM to a server","Buying new office furniture","Increasing the marketing budget"],"a":0},{"id":145,"cat":"QA","q":"What does 'Quality Control' typically verify?","opts":["Whether the final product meets specified requirements","Whether marketing materials are accurate","Whether employees are satisfied","Whether the server has enough storage"],"a":0},{"id":146,"cat":"Network","q":"Which protocol is commonly used for network monitoring and management?","opts":["FTP","SNMP","HTTP","POP3"],"a":1},{"id":147,"cat":"Network","q":"What is the primary goal of network management?","opts":["To deploy hardware across multiple locations","To ensure reliable and secure operation of a network","To manage user accounts and permissions","To provide encryption services for emails"],"a":1},{"id":148,"cat":"Network","q":"Which network management function involves analyzing network traffic to detect anomalies?","opts":["Configuration Management","Fault Management","Performance Management","Security Management"],"a":2},{"id":149,"cat":"Network","q":"What tool is commonly used for monitoring and managing network performance?","opts":["Nagios","Docker","Selenium","Visual Studio"],"a":0},{"id":150,"cat":"Network","q":"What does the term 'bandwidth utilization' refer to in network management?","opts":["The total storage capacity of a network","The speed of file downloads on a network","The amount of data transmitted over the network in a given time","The number of devices connected to the network"],"a":2},{"id":151,"cat":"Network","q":"Which network management function involves identifying and resolving network faults?","opts":["Performance Management","Fault Management","Security Management","Configuration Management"],"a":1},{"id":152,"cat":"Network","q":"What is a critical component of a disaster recovery plan in network management?","opts":["Automated bug fixing","Backup and restore systems","Continuous integration pipelines","Manual deployment processes"],"a":1},{"id":153,"cat":"Network","q":"What does Configuration Management in networking primarily involve?","opts":["Configuring and updating network device settings","Writing application source code","Designing UI wireframes","Managing marketing campaigns"],"a":0},{"id":154,"cat":"Network","q":"Which tool is commonly used for automating network device configuration?","opts":["Ansible","Photoshop","Selenium","JIRA"],"a":0},{"id":155,"cat":"Network","q":"What does VLAN stand for and what is its purpose?","opts":["Virtual Local Area Network; segments a network logically","Very Large Area Network; expands physical network range","Verified Local Access Node; user authentication","Variable Length Address Notation; IP addressing scheme"],"a":0},{"id":156,"cat":"Network","q":"What is the purpose of Network Segmentation?","opts":["To merge all devices into a single broadcast domain","To divide a network into isolated segments for security and performance","To remove the need for firewalls","To increase network latency intentionally"],"a":1},{"id":157,"cat":"Network","q":"Which backup strategy involves backing up only data changed since the last full backup?","opts":["Full Backup","Incremental Backup","Differential Backup","Mirror Backup"],"a":1},{"id":158,"cat":"Network","q":"Which backup strategy backs up all data changed since the last FULL backup (not the last backup)?","opts":["Incremental Backup","Differential Backup","Snapshot Backup","Partial Backup"],"a":1},{"id":159,"cat":"Network","q":"What is the role of a Firewall in network management?","opts":["To monitor and block unauthorized access","To increase the speed of data transmission","To reduce the cost of network management","To store user credentials securely"],"a":0},{"id":160,"cat":"Network","q":"What is the primary purpose of Load Balancing in a network?","opts":["Distribute traffic evenly across multiple servers","Reduce the number of users on a network","Encrypt all network traffic","Eliminate the need for firewalls"],"a":0},{"id":161,"cat":"Network","q":"What is High Availability primarily designed to achieve?","opts":["Minimize hardware costs","Ensure systems remain operational with minimal downtime","Reduce the number of network devices","Eliminate the need for monitoring"],"a":1},{"id":162,"cat":"Network","q":"Which protocol translates domain names into IP addresses?","opts":["DNS","FTP","SNMP","SMTP"],"a":0},{"id":163,"cat":"Network","q":"What is the function of DHCP in a network?","opts":["Automatically assigns IP addresses to devices","Encrypts network traffic","Monitors network bandwidth","Blocks malicious websites"],"a":0},{"id":164,"cat":"Network","q":"What does IDS stand for in network security?","opts":["Intrusion Detection System","Internal Data Storage","Integrated Development System","Internet Domain Service"],"a":0},{"id":165,"cat":"Network","q":"What does IPS stand for and what does it do differently from IDS?","opts":["Intrusion Prevention System; actively blocks threats vs only detecting them","Internet Protocol Security; encrypts emails","Internal Process Scheduler; manages CPU tasks","Integrated Print System; manages printers"],"a":0},{"id":166,"cat":"Network","q":"What is the primary use of a VPN?","opts":["To increase internet speed","To create a secure, encrypted connection over an untrusted network","To block all internet access","To manage user passwords"],"a":1},{"id":167,"cat":"Network","q":"What does the term 'Network Latency' refer to?","opts":["The total storage on a network","The delay before data transfer begins following an instruction","The number of devices connected","The bandwidth utilization percentage"],"a":1},{"id":168,"cat":"Network","q":"Which network topology connects all devices to a single central hub?","opts":["Star Topology","Mesh Topology","Ring Topology","Bus Topology"],"a":0},{"id":169,"cat":"Network","q":"In a Mesh Topology, how are devices typically connected?","opts":["Only to a central server","Each device connects to multiple other devices","In a single line","Only through the internet"],"a":1},{"id":170,"cat":"Network","q":"What is the primary function of a network switch?","opts":["Connect devices within a LAN and forward data based on MAC address","Provide internet access from an ISP","Encrypt all outgoing emails","Store website content"],"a":0},{"id":171,"cat":"Network","q":"What is the function of a router in networking?","opts":["Forward data packets between different networks","Only store files locally","Provide power to devices","Display network logs visually"],"a":0},{"id":172,"cat":"Network","q":"What does QoS (Quality of Service) help manage in a network?","opts":["Prioritizing certain types of traffic for better performance","User login credentials","Physical cable lengths","Server room temperature"],"a":0},{"id":173,"cat":"Network","q":"What does the term 'Network Redundancy' refer to?","opts":["Removing unused devices from a network","Having backup components to ensure continued operation if one fails","Reducing bandwidth usage","Increasing the number of users"],"a":1},{"id":174,"cat":"Network","q":"Which of the following best describes Performance Management in networking?","opts":["Tracking network speed, latency, and throughput to maintain SLAs","Writing application code","Designing the company logo","Managing employee payroll"],"a":0},{"id":175,"cat":"Network","q":"What is the purpose of a Network Operations Center (NOC)?","opts":["To centrally monitor and manage network health and performance","To design marketing materials","To handle customer billing","To manufacture network hardware"],"a":0},{"id":176,"cat":"Cybersecurity","q":"What is the principle of 'Defense in Depth'?","opts":["Using multiple layers of security to protect a system","Keeping all systems offline for safety","Relying only on encryption to secure data","Using one strong firewall as the sole defense"],"a":0},{"id":177,"cat":"Cybersecurity","q":"What is the purpose of a firewall in a network?","opts":["To monitor and block unauthorized access","To increase the speed of data transmission","To reduce the cost of network management","To store user credentials securely"],"a":0},{"id":178,"cat":"Cybersecurity","q":"Which cybersecurity practice helps minimize the risk of privilege escalation attacks?","opts":["Using default system accounts","Granting least privilege to users","Allowing unrestricted file access","Disabling multi-factor authentication"],"a":1},{"id":179,"cat":"Cybersecurity","q":"Which attack exploits vulnerabilities in software to gain unauthorized access to a system?","opts":["Phishing","SQL Injection","DDoS","Spoofing"],"a":1},{"id":180,"cat":"Cybersecurity","q":"What is a common tool used for penetration testing in cybersecurity?","opts":["JMeter","OWASP ZAP","GitLab","Ansible"],"a":1},{"id":181,"cat":"Cybersecurity","q":"What does the CIA Triad in cybersecurity stand for?","opts":["Confidentiality, Integrity, Availability","Central Intelligence Agency","Cyber Investigation Authority","Control, Inspect, Audit"],"a":0},{"id":182,"cat":"Cybersecurity","q":"What does 'Confidentiality' in the CIA Triad ensure?","opts":["Data is accurate and unaltered","Only authorized users can access information","Systems remain available to users","Actions cannot be denied by the sender"],"a":1},{"id":183,"cat":"Cybersecurity","q":"What does 'Integrity' in the CIA Triad ensure?","opts":["Data is accurate and has not been tampered with","Only authorized users can access information","Systems are always available","Data is encrypted at all times"],"a":0},{"id":184,"cat":"Cybersecurity","q":"What does 'Availability' in the CIA Triad ensure?","opts":["Data is encrypted","Authorized users can access resources when needed","Only admins can log in","Passwords are changed frequently"],"a":1},{"id":185,"cat":"Cybersecurity","q":"What is Phishing?","opts":["A type of network hardware failure","A social engineering attack to steal sensitive information via fake communications","A method of encrypting data","A network performance testing technique"],"a":1},{"id":186,"cat":"Cybersecurity","q":"What is a DDoS attack designed to do?","opts":["Steal user passwords silently","Overwhelm a system with traffic to make it unavailable","Encrypt files for ransom","Install spyware on a single device"],"a":1},{"id":187,"cat":"Cybersecurity","q":"What is Ransomware?","opts":["Software that encrypts a victim's data and demands payment for the decryption key","A type of firewall","A network monitoring protocol","A penetration testing tool"],"a":0},{"id":188,"cat":"Cybersecurity","q":"What is a Zero-Day Exploit?","opts":["An attack exploiting a vulnerability unknown to the vendor with no available patch","An attack that takes zero days to detect","A vulnerability that has existed for years","A type of firewall configuration"],"a":0},{"id":189,"cat":"Cybersecurity","q":"What does MFA stand for in cybersecurity?","opts":["Multi-Factor Authentication","Mandatory File Access","Managed Firewall Application","Multiple Failure Alert"],"a":0},{"id":190,"cat":"Cybersecurity","q":"What is the benefit of Multi-Factor Authentication (MFA)?","opts":["It requires only a single password for login","It adds extra layers of identity verification beyond just a password","It removes the need for passwords entirely","It only works for admin accounts"],"a":1},{"id":191,"cat":"Cybersecurity","q":"What does SSO stand for?","opts":["Single Sign-On","Secure Server Operation","System Security Override","Shared Session Object"],"a":0},{"id":192,"cat":"Cybersecurity","q":"What is the benefit of Single Sign-On (SSO)?","opts":["Users authenticate once to access multiple systems","Users must log in separately to every system","It disables multi-factor authentication","It only works on local networks"],"a":0},{"id":193,"cat":"Cybersecurity","q":"What is Symmetric Encryption?","opts":["Uses the same key for both encryption and decryption","Uses a public key to encrypt and a private key to decrypt","Does not require any key","Only works for text data"],"a":0},{"id":194,"cat":"Cybersecurity","q":"What is Asymmetric Encryption?","opts":["Uses the same key for encryption and decryption","Uses a public key to encrypt and a private key to decrypt","Requires no encryption keys at all","Is only used for file compression"],"a":1},{"id":195,"cat":"Cybersecurity","q":"Which algorithm is a common example of Symmetric Encryption?","opts":["AES","RSA","SHA-256","MD5"],"a":0},{"id":196,"cat":"Cybersecurity","q":"Which algorithm is a common example of Asymmetric Encryption?","opts":["AES","RSA","DES","SHA-1"],"a":1},{"id":197,"cat":"Cybersecurity","q":"What is Hashing used for in cybersecurity?","opts":["Converting data into a fixed-length string for integrity verification","Encrypting data for two-way communication","Compressing files for storage","Routing network traffic"],"a":0},{"id":198,"cat":"Cybersecurity","q":"What is a Digital Signature used to verify?","opts":["The speed of a network connection","The authenticity and integrity of a message or document","The bandwidth utilization of a server","The hardware specifications of a device"],"a":1},{"id":199,"cat":"Cybersecurity","q":"What does RBAC stand for in access control?","opts":["Role-Based Access Control","Remote Backup and Configuration","Rule-Based Authentication Code","Regional Border Access Control"],"a":0},{"id":200,"cat":"Cybersecurity","q":"What is the purpose of RBAC (Role-Based Access Control)?","opts":["Grant access permissions based on user roles within an organization","Encrypt all network traffic","Monitor network bandwidth usage","Backup data automatically"],"a":0},{"id":201,"cat":"Cybersecurity","q":"What does SIEM stand for in cybersecurity?","opts":["Security Information and Event Management","System Integration and Error Monitoring","Secure Internet Email Management","Server Infrastructure Event Mapping"],"a":0},{"id":202,"cat":"Cybersecurity","q":"What is the main purpose of a SIEM tool?","opts":["Collect and analyze security event data from across an organization","Design website layouts","Manage employee payroll","Compress large video files"],"a":0},{"id":203,"cat":"Cybersecurity","q":"What does APT stand for in the context of cyber threats?","opts":["Advanced Persistent Threat","Automated Patch Tool","Application Performance Test","Asynchronous Process Trigger"],"a":0},{"id":204,"cat":"Cybersecurity","q":"What characterizes an Advanced Persistent Threat (APT)?","opts":["A quick, one-time attack","A long-term, targeted, and stealthy attack campaign","An attack that only affects hardware","A type of antivirus software"],"a":1},{"id":205,"cat":"Cybersecurity","q":"What is the purpose of TLS/SSL in network communication?","opts":["To physically secure server rooms","To encrypt and secure data transmitted over the internet","To manage user accounts","To monitor CPU usage"],"a":1},{"id":206,"cat":"Cybersecurity","q":"What is Social Engineering in the context of cybersecurity?","opts":["Manipulating people into divulging confidential information","A method for encrypting databases","A network performance testing technique","A type of firewall configuration"],"a":0},{"id":207,"cat":"Cybersecurity","q":"What is the first phase of the Incident Response process?","opts":["Eradication","Preparation","Recovery","Containment"],"a":1},{"id":208,"cat":"Cybersecurity","q":"What is the goal of the 'Containment' phase in Incident Response?","opts":["Identify the root cause of an incident","Limit the scope and spread of a security breach","Restore systems to normal operation","Train employees on security awareness"],"a":1},{"id":209,"cat":"Cybersecurity","q":"What does NIST CSF stand for?","opts":["National Institute of Standards and Technology Cybersecurity Framework","National Internet Security Testing Code Format","Network Information Security Threat Catalogue","New Internet Security Technology Framework"],"a":0},{"id":210,"cat":"Cybersecurity","q":"What is the purpose of Vulnerability Scanning tools like Nessus?","opts":["Identify known security weaknesses in systems","Design user interfaces","Manage network bandwidth allocation","Compress data for storage"],"a":0},{"id":211,"cat":"Cybersecurity","q":"What is the main risk of using default system accounts and passwords?","opts":["They improve system performance significantly","Attackers can easily exploit them for unauthorized access","They have no impact on security","They are required for normal operation"],"a":1},{"id":212,"cat":"Cybersecurity","q":"What does Non-repudiation ensure in cybersecurity?","opts":["A sender cannot deny having sent a message","Data is always available","Data is encrypted at rest","Systems have backup power"],"a":0},{"id":213,"cat":"Cybersecurity","q":"What is Spoofing in cybersecurity?","opts":["Disguising communication to appear as if from a trusted source","Encrypting files for ransom","Monitoring network performance","Backing up critical data"],"a":0},{"id":214,"cat":"Cybersecurity","q":"What type of malware secretly monitors and collects user activity?","opts":["Spyware","Firewall","Patch","Load balancer"],"a":0},{"id":215,"cat":"Cybersecurity","q":"What is the purpose of regular security patching?","opts":["To fix known vulnerabilities and reduce attack surface","To increase software cost","To slow down system performance intentionally","To remove all user accounts"],"a":0},{"id":216,"cat":"Cybersecurity","q":"What is a Man-in-the-Middle (MITM) attack?","opts":["An attacker intercepts communication between two parties","An attacker physically steals a device","An attack that only targets mobile devices","A type of firewall configuration"],"a":0},{"id":217,"cat":"Cybersecurity","q":"Which of these is considered an Insider Threat?","opts":["An external hacker using phishing emails","A disgruntled employee misusing authorized access","A DDoS attack from a botnet","A zero-day exploit from an unknown source"],"a":1},{"id":218,"cat":"Cybersecurity","q":"What is the purpose of Network Access Control (NAC)?","opts":["Restrict unauthorized devices from connecting to a network","Encrypt all stored files","Monitor employee productivity","Design the company website"],"a":0},{"id":219,"cat":"Cybersecurity","q":"What does the term 'Attack Surface' refer to?","opts":["The total number of employees in IT","The sum of all possible points where an attacker could try to enter a system","The physical size of a server room","The speed of a network connection"],"a":1},{"id":220,"cat":"Cybersecurity","q":"What is the primary purpose of an Acceptable Use Policy (AUP) in an organization?","opts":["Define rules for appropriate use of IT systems and resources","Encrypt all company data","Configure network routers","Design the company's marketing strategy"],"a":0},{"id":221,"cat":"ProjectMgmt","q":"What is the primary goal of the Risk Management process in project management?","opts":["Minimize project scope","Identify and mitigate potential challenges","Reduce project budget","Optimize team performance"],"a":1},{"id":222,"cat":"ProjectMgmt","q":"What is the purpose of a RACI matrix in stakeholder management?","opts":["Identifying risks and mitigation strategies","Mapping project dependencies","Defining roles and responsibilities of stakeholders","Scheduling project timelines"],"a":2},{"id":223,"cat":"ProjectMgmt","q":"What is the purpose of Earned Value Management (EVM) in project management?","opts":["Tracking project scope changes","Measuring project performance against cost and schedule","Identifying stakeholder roles and responsibilities","Ensuring risk-free project execution"],"a":1},{"id":224,"cat":"ProjectMgmt","q":"What does the 'R' in RACI stand for?","opts":["Responsible","Reviewed","Required","Resourced"],"a":0},{"id":225,"cat":"ProjectMgmt","q":"What does the 'A' in RACI stand for?","opts":["Available","Accountable","Assigned","Approved"],"a":1},{"id":226,"cat":"ProjectMgmt","q":"What is the Triple Constraint in project management?","opts":["Scope, Time, Cost","Risk, Quality, Stakeholders","People, Process, Tools","Planning, Execution, Closure"],"a":0},{"id":227,"cat":"ProjectMgmt","q":"What is a Work Breakdown Structure (WBS) used for?","opts":["Breaking large tasks into smaller manageable units","Tracking employee attendance","Managing network configurations","Designing the user interface"],"a":0},{"id":228,"cat":"ProjectMgmt","q":"What does a Gantt Chart primarily visualize?","opts":["Network topology","Project timeline and task dependencies","Code complexity","Server performance metrics"],"a":1},{"id":229,"cat":"ProjectMgmt","q":"What does CPM stand for in project scheduling?","opts":["Critical Path Method","Continuous Process Monitoring","Code Performance Metric","Centralized Project Management"],"a":0},{"id":230,"cat":"ProjectMgmt","q":"What is the purpose of the Critical Path Method (CPM)?","opts":["Identify the sequence of tasks that determines the project's minimum duration","Track employee salaries","Design network diagrams","Manage software licenses"],"a":0},{"id":231,"cat":"ProjectMgmt","q":"What are the five typical phases of the Project Lifecycle?","opts":["Initiation, Planning, Execution, Monitoring & Control, Closure","Design, Code, Test, Deploy, Maintain","Plan, Do, Check, Act, Review","Requirement, Design, Build, Test, Release"],"a":0},{"id":232,"cat":"ProjectMgmt","q":"What is the purpose of a Stakeholder Map?","opts":["Classify stakeholders by their influence and interest in the project","Show the physical location of stakeholders","List stakeholder salaries","Schedule stakeholder meetings only"],"a":0},{"id":233,"cat":"ProjectMgmt","q":"What does the term 'Scope Creep' refer to?","opts":["Uncontrolled changes or growth in a project's scope","A method to reduce project costs","A formal change request process","A type of project closure activity"],"a":0},{"id":234,"cat":"ProjectMgmt","q":"Which document defines the formal process for handling scope changes in a project?","opts":["Change Control Plan","Risk Register","RACI Matrix","Test Plan"],"a":0},{"id":235,"cat":"ProjectMgmt","q":"What is a Risk Register used for?","opts":["Logging identified risks, their impact, and mitigation plans","Tracking employee performance","Listing all software bugs","Recording network configurations"],"a":0},{"id":236,"cat":"ProjectMgmt","q":"What does KPI stand for in project monitoring?","opts":["Key Performance Indicator","Known Project Issue","Key Process Improvement","Kanban Performance Index"],"a":0},{"id":237,"cat":"ProjectMgmt","q":"What is the purpose of tracking KPIs in a project?","opts":["Measure progress and performance against defined goals","Design the project logo","Configure network firewalls","Write source code"],"a":0},{"id":238,"cat":"ProjectMgmt","q":"What is the main purpose of Quality Planning in project management?","opts":["Define the quality standards and criteria for the project","Hire new team members","Configure servers","Design marketing campaigns"],"a":0},{"id":239,"cat":"ProjectMgmt","q":"What is Quality Assurance's role within project management (distinct from QC)?","opts":["Conducting process audits during development to ensure standards are met","Only inspecting the final product","Writing the project budget","Managing the project's social media"],"a":0},{"id":240,"cat":"ProjectMgmt","q":"What is the purpose of a Communication Plan in project management?","opts":["Define how, when, and with whom information will be shared","Encrypt project files","Design the user interface","Allocate the project budget"],"a":0},{"id":241,"cat":"ProjectMgmt","q":"Which project management tool is commonly used for task tracking and Kanban boards?","opts":["Trello","Photoshop","Wireshark","OWASP ZAP"],"a":0},{"id":242,"cat":"ProjectMgmt","q":"What is the purpose of a Project Charter?","opts":["Formally authorize a project and define its objectives","Track daily task completion","List all defects found","Manage employee payroll"],"a":0},{"id":243,"cat":"ProjectMgmt","q":"What does the project Closure phase typically involve?","opts":["Initial scope definition","Formal completion, handover, and lessons learned documentation","Writing the first lines of code","Conducting the kickoff meeting"],"a":1},{"id":244,"cat":"ProjectMgmt","q":"What is the purpose of a Lessons Learned document at project closure?","opts":["Capture insights to improve future projects","Record employee vacation days","List unused project budget","Define the next project's scope only"],"a":0},{"id":245,"cat":"ProjectMgmt","q":"What does the term 'Milestone' refer to in project management?","opts":["A significant point or event marking progress in a project","A type of software bug","A network device","A testing tool"],"a":0},{"id":246,"cat":"ProjectMgmt","q":"What is the main benefit of using Agile project management for software projects?","opts":["Rigid, unchangeable requirements","Flexibility to adapt to changing requirements through iterations","Elimination of all documentation","No need for stakeholder communication"],"a":1},{"id":247,"cat":"ProjectMgmt","q":"What does 'Risk Mitigation' involve?","opts":["Taking actions to reduce the probability or impact of a risk","Ignoring identified risks","Increasing project risk for higher returns","Removing the risk register entirely"],"a":0},{"id":248,"cat":"ProjectMgmt","q":"In stakeholder management, which group typically has high influence and high interest?","opts":["Manage Closely","Keep Satisfied","Keep Informed","Monitor"],"a":0},{"id":249,"cat":"ProjectMgmt","q":"What is Change Control primarily designed to manage?","opts":["Requests to modify project scope, schedule, or cost in a structured way","Daily standup meeting schedules","Network configuration changes only","Employee onboarding"],"a":0},{"id":250,"cat":"ProjectMgmt","q":"What is the purpose of Resource Allocation in project planning?","opts":["Assign the right people, budget, and tools to project tasks","Design the company website","Configure network firewalls","Write test cases"],"a":0}]
+;
+
+// ---------- App State ----------
+let examQuestions = [];   // the randomly-selected subset for this exam run
+let userAnswers = {};     // { questionIndex: selectedOptionIndex }
+let currentIndex = 0;
+let timerInterval = null;
+let secondsRemaining = 0;
+let examStartTime = null;
+let examDurationSeconds = 0;
+let reviewFilter = 'all';
+
+// ---------- Utility: Fisher-Yates shuffle ----------
+function shuffle(array) {
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+// Shuffle a question's options too, so the correct answer position isn't memorized across retakes
+function shuffleQuestionOptions(question) {
+  const indices = [0, 1, 2, 3];
+  const shuffledIdx = shuffle(indices);
+  const newOpts = shuffledIdx.map(i => question.opts[i]);
+  const newAnswerIdx = shuffledIdx.indexOf(question.a);
+  return { ...question, opts: newOpts, a: newAnswerIdx };
+}
+
+// ---------- Init home screen stats ----------
+function initHome() {
+  document.getElementById('stat-total').textContent = QUESTION_BANK.length;
+
+  const cats = {};
+  QUESTION_BANK.forEach(q => cats[q.cat] = (cats[q.cat] || 0) + 1);
+  const tagsContainer = document.getElementById('topic-tags');
+  tagsContainer.innerHTML = Object.entries(cats)
+    .map(([cat, count]) => `<span class="tag">${catLabel(cat)} · ${count}</span>`)
+    .join('');
+}
+
+function catLabel(cat) {
+  const labels = {
+    SDLC: 'SDLC', Architecture: 'Architecture & UX', Testing: 'Testing',
+    QA: 'Quality Assurance', Network: 'Network Mgmt', Cybersecurity: 'Cybersecurity',
+    ProjectMgmt: 'Project Mgmt'
+  };
+  return labels[cat] || cat;
+}
+
+// ---------- Screen navigation ----------
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ---------- Start exam ----------
+function startExam() {
+  const numQ = Math.max(5, Math.min(250, parseInt(document.getElementById('num-questions').value) || 50));
+  const timeLimit = Math.max(5, Math.min(180, parseInt(document.getElementById('time-limit').value) || 45));
+
+  const pool = shuffle(QUESTION_BANK);
+  const selected = pool.slice(0, numQ);
+  examQuestions = selected.map(shuffleQuestionOptions);
+
+  userAnswers = {};
+  currentIndex = 0;
+  examDurationSeconds = timeLimit * 60;
+  secondsRemaining = examDurationSeconds;
+  examStartTime = Date.now();
+
+  buildPalette();
+  renderQuestion();
+  startTimer();
+  showScreen('screen-exam');
+}
+
+// ---------- Timer ----------
+function startTimer() {
+  clearInterval(timerInterval);
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    secondsRemaining--;
+    updateTimerDisplay();
+    if (secondsRemaining <= 0) {
+      clearInterval(timerInterval);
+      submitExam(true);
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(secondsRemaining / 60);
+  const s = secondsRemaining % 60;
+  const el = document.getElementById('timer');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.classList.remove('warning', 'danger');
+  if (secondsRemaining <= 60) el.classList.add('danger');
+  else if (secondsRemaining <= 300) el.classList.add('warning');
+}
+
+// ---------- Render question ----------
+function renderQuestion() {
+  const q = examQuestions[currentIndex];
+  document.getElementById('q-counter').textContent = `Question ${currentIndex + 1} of ${examQuestions.length}`;
+  document.getElementById('q-tag').textContent = catLabel(q.cat);
+  document.getElementById('q-text').textContent = q.q;
+
+  const pct = Math.round(((currentIndex + 1) / examQuestions.length) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const optsContainer = document.getElementById('q-options');
+  optsContainer.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.opts.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (userAnswers[currentIndex] === i ? ' selected' : '');
+    div.innerHTML = `<span class="letter">${letters[i]}</span><span>${opt}</span>`;
+    div.onclick = () => selectAnswer(i);
+    optsContainer.appendChild(div);
+  });
+
+  document.getElementById('btn-prev').disabled = currentIndex === 0;
+  document.getElementById('btn-prev').style.opacity = currentIndex === 0 ? '0.5' : '1';
+  document.getElementById('btn-next').textContent = currentIndex === examQuestions.length - 1 ? 'Finish →' : 'Next →';
+
+  updatePalette();
+}
+
+function selectAnswer(i) {
+  userAnswers[currentIndex] = i;
+  renderQuestion();
+}
+
+// ---------- Navigation ----------
+document.getElementById('btn-prev').onclick = () => {
+  if (currentIndex > 0) { currentIndex--; renderQuestion(); }
+};
+document.getElementById('btn-next').onclick = () => {
+  if (currentIndex < examQuestions.length - 1) { currentIndex++; renderQuestion(); }
+  else { attemptSubmit(); }
+};
+
+// ---------- Palette ----------
+function buildPalette() {
+  const palette = document.getElementById('palette');
+  palette.innerHTML = '';
+  examQuestions.forEach((_, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'palette-btn';
+    btn.textContent = i + 1;
+    btn.onclick = () => { currentIndex = i; renderQuestion(); };
+    palette.appendChild(btn);
+  });
+}
+
+function updatePalette() {
+  const buttons = document.querySelectorAll('.palette-btn');
+  buttons.forEach((btn, i) => {
+    btn.classList.remove('answered', 'current');
+    if (userAnswers[i] !== undefined) btn.classList.add('answered');
+    if (i === currentIndex) btn.classList.add('current');
+  });
+}
+
+// ---------- Submit flow ----------
+function attemptSubmit() {
+  const unanswered = examQuestions.length - Object.keys(userAnswers).length;
+  if (unanswered > 0) {
+    document.getElementById('modal-text').textContent =
+      `You have ${unanswered} unanswered question${unanswered > 1 ? 's' : ''}. Are you sure you want to submit?`;
+    document.getElementById('modal-confirm').classList.add('active');
+  } else {
+    submitExam(false);
+  }
+}
+
+document.getElementById('btn-submit-exam').onclick = attemptSubmit;
+document.getElementById('modal-cancel').onclick = () => document.getElementById('modal-confirm').classList.remove('active');
+document.getElementById('modal-confirm-btn').onclick = () => {
+  document.getElementById('modal-confirm').classList.remove('active');
+  submitExam(false);
+};
+
+function submitExam(autoSubmitted) {
+  clearInterval(timerInterval);
+  showResults(autoSubmitted);
+}
+
+// ---------- Results ----------
+function showResults(autoSubmitted) {
+  const total = examQuestions.length;
+  let correct = 0;
+  const catStats = {};
+
+  examQuestions.forEach((q, i) => {
+    if (!catStats[q.cat]) catStats[q.cat] = { correct: 0, total: 0 };
+    catStats[q.cat].total++;
+    if (userAnswers[i] === q.a) {
+      correct++;
+      catStats[q.cat].correct++;
+    }
+  });
+
+  const pct = Math.round((correct / total) * 100);
+  const elapsedSeconds = examDurationSeconds - secondsRemaining;
+  const mins = Math.floor(elapsedSeconds / 60);
+  const secs = elapsedSeconds % 60;
+
+  document.getElementById('result-pct').textContent = pct + '%';
+  document.getElementById('result-frac').textContent = `${correct}/${total}`;
+  document.getElementById('time-taken-text').textContent =
+    `Time taken: ${mins}m ${secs}s${autoSubmitted ? ' (auto-submitted — time expired)' : ''}`;
+
+  const circumference = 2 * Math.PI * 60;
+  const ring = document.getElementById('ring-fill');
+  ring.setAttribute('stroke-dasharray', circumference);
+  const offset = circumference - (pct / 100) * circumference;
+  setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+  ring.style.stroke = pct >= 60 ? 'var(--green)' : pct >= 40 ? 'var(--amber)' : 'var(--red)';
+
+  const verdict = document.getElementById('verdict-text');
+  if (pct >= 80) { verdict.textContent = 'Excellent! You are well prepared.'; verdict.className = 'verdict pass'; }
+  else if (pct >= 60) { verdict.textContent = 'Good job — a little more revision will help.'; verdict.className = 'verdict pass'; }
+  else { verdict.textContent = 'Needs more practice — review the question bank.'; verdict.className = 'verdict fail'; }
+
+  const breakdownList = document.getElementById('breakdown-list');
+  breakdownList.innerHTML = Object.entries(catStats).map(([cat, s]) => {
+    const cPct = Math.round((s.correct / s.total) * 100);
+    return `<div class="breakdown-row">
+      <span style="min-width:110px;">${catLabel(cat)}</span>
+      <div class="breakdown-bar"><div class="breakdown-fill" style="width:${cPct}%; background:${cPct>=60?'var(--green)':cPct>=40?'var(--amber)':'var(--red)'}"></div></div>
+      <span style="min-width:46px; text-align:right; color:var(--text-dim);">${s.correct}/${s.total}</span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('review-section').style.display = 'none';
+  reviewFilter = 'all';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+
+  showScreen('screen-results');
+}
+
+document.getElementById('btn-review').onclick = () => {
+  const section = document.getElementById('review-section');
+  section.style.display = section.style.display === 'none' ? 'block' : 'none';
+  renderReview();
+};
+
+document.getElementById('btn-retake').onclick = () => showScreen('screen-home');
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.onclick = () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    reviewFilter = btn.dataset.filter;
+    renderReview();
+  };
+});
+
+function renderReview() {
+  const list = document.getElementById('review-list');
+  const letters = ['A', 'B', 'C', 'D'];
+  let html = '';
+
+  examQuestions.forEach((q, i) => {
+    const userAns = userAnswers[i];
+    const isCorrect = userAns === q.a;
+    const isAnswered = userAns !== undefined;
+
+    if (reviewFilter === 'correct' && !isCorrect) return;
+    if (reviewFilter === 'incorrect' && isCorrect) return;
+
+    html += `<div class="review-item">
+      <span class="q-tag">${catLabel(q.cat)}</span>
+      <div class="q-text">${i+1}. ${q.q}</div>`;
+
+    q.opts.forEach((opt, oi) => {
+      let cls = 'neutral';
+      let icon = '';
+      if (oi === q.a) { cls = 'correct'; icon = '✓ '; }
+      else if (oi === userAns) { cls = 'incorrect'; icon = '✗ '; }
+      html += `<div class="review-opt ${cls}">${icon}${letters[oi]}. ${opt}</div>`;
+    });
+
+    if (!isAnswered) {
+      html += `<div style="font-size:12px; color:var(--text-dim); margin-top:6px;">Not answered</div>`;
+    }
+    html += `</div>`;
+  });
+
+  list.innerHTML = html || '<p style="color:var(--text-dim); text-align:center; padding:20px;">No questions match this filter.</p>';
+}
+
+// ---------- Browse full bank (bonus view) ----------
+document.getElementById('btn-view-bank').onclick = () => {
+  examQuestions = QUESTION_BANK.map(q => ({ ...q }));
+  userAnswers = {};
+  currentIndex = 0;
+  examDurationSeconds = 999999;
+  secondsRemaining = 999999;
+  buildPalette();
+  renderQuestion();
+  document.getElementById('timer').textContent = 'Browse';
+  document.getElementById('btn-submit-exam').textContent = 'Exit to home';
+  document.getElementById('btn-submit-exam').onclick = () => showScreen('screen-home');
+  clearInterval(timerInterval);
+  showScreen('screen-exam');
+};
+
+// ---------- Wire up start button ----------
+document.getElementById('btn-start-exam').onclick = startExam;
+
+// ---------- Init ----------
+initHome();
+</script>
+</body>
+</html>
